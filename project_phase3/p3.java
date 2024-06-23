@@ -1,7 +1,7 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class p3 {
+public class p3_scanner {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Connection connection = null;
@@ -50,10 +50,12 @@ public class p3 {
     }
 
     public static void locations (Connection connection) throws SQLException {
+        // user input
         Scanner locationScanner = new Scanner(System.in);
         System.out.println("Enter Location ID: ");
         String locationID = locationScanner.nextLine();
 
+        // create query
         String sql = "select * from Locations where locationID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, locationID);
@@ -80,10 +82,12 @@ public class p3 {
     }
 
     public static void edges (Connection connection) throws SQLException {
+        // user input
         Scanner edgeScanner = new Scanner(System.in);
         System.out.println("Enter Edge ID: ");
         String edgeID = edgeScanner.nextLine();
 
+        // create query
         String sql = "select e.edgeID, s.locationName as startingLocationName, s.mapFloor as startingLocationFloor, " +
                 "en.locationName as endingLocationName, en.mapFloor as endingLocationFloor from Edges e " +
                 "join Locations s on e.startingLocationID = s.locationID " +
@@ -113,10 +117,12 @@ public class p3 {
     }
 
     public static void csstaff(Connection connection) throws SQLException {
+        // user input
         Scanner staffScanner = new Scanner(System.in);
         System.out.println("Enter CS Staff Account Name: ");
         String staffName = staffScanner.nextLine();
 
+        // create query
         String sql = "select c.accountName, c.firstName, c.lastName, c.officeID, t.titleName " +
                 "from CSStaff c " +
                 "left join CSStaffTitles cst on c.accountName = cst.accountName " +
@@ -128,12 +134,11 @@ public class p3 {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 boolean found = false;
-                StringBuilder titles = new StringBuilder(); // StringBuilder to store titles
-                StringBuilder phoneExts = new StringBuilder(); // StringBuilder to store phone extensions
+                StringBuilder titles = new StringBuilder();
 
                 while (rs.next()) {
                     if (!found) {
-                        // print cs staff information (only once)
+                        // print staff information
                         System.out.println("CS Staff Information");
                         System.out.println("Account Name: " + rs.getString("accountName"));
                         System.out.println("First Name: " + rs.getString("firstName"));
@@ -142,7 +147,7 @@ public class p3 {
                         found = true;
                     }
 
-                    // append title to StringBuilder
+                    // print title information
                     if (titles.length() > 0) {
                         titles.append(", ");
                     }
@@ -153,10 +158,10 @@ public class p3 {
                     System.out.println("CS Staff with account name '" + staffName + "' could not be found.");
                 }
 
-                // print titles
                 System.out.println("Title(s): " + titles.toString());
 
-                // fetch and print phone extensions
+                // create query & print phone extensions
+                StringBuilder phoneExts = new StringBuilder();
                 String phoneSql = "select phoneExt from PhoneExtensions where accountName = ?";
                 try (PreparedStatement phoneStmt = connection.prepareStatement(phoneSql)) {
                     phoneStmt.setString(1, staffName);
@@ -186,6 +191,7 @@ public class p3 {
     }
 
     public static void insertPhone (Connection connection) throws SQLException {
+        //user input
         Scanner phoneScanner = new Scanner(System.in);
 
         try {
@@ -194,6 +200,7 @@ public class p3 {
             System.out.println("Enter the new Phone Extension: ");
             String newPhone = phoneScanner.nextLine();
 
+            // create query
             String sql = "insert into PhoneExtensions (accountName, phoneExt) values (?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, staffName);
